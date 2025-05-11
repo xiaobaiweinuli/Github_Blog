@@ -831,7 +831,7 @@
                 const username = document.getElementById('username').value;
                 const password = document.getElementById('password').value;
                 
-                if (username === import.meta.env.VITE_ADMIN_USERNAME && password === import.meta.env.VITE_ADMIN_SECRET) {
+                if (username === process.env.ADMIN_USERNAME && password === process.env.ADMIN_SECRET) {
                     localStorage.setItem('adminLoggedIn', 'true');
                     document.getElementById('login-container').classList.add('hidden');
                     document.getElementById('admin-content').classList.remove('hidden');
