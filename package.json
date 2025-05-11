@@ -8,6 +8,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "vite": "^4.4.9"
+    "vite": "^4.4.9",
+    "marked": "^4.2.12",
+    "highlight.js": "^11.7.0",
+    "particles.js": "^2.0.0"
   }
 }
