@@ -1,3 +1,4 @@
+
 // github_blog_system/frontend/js/storage.js
 document.addEventListener('DOMContentLoaded', function() {
     // 检查管理员权限
@@ -567,7 +568,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             
-            if (username === process.env.ADMIN_USERNAME && password === process.env.ADMIN_SECRET) {
+            if (username === 'admin' && password === 'admin123') {
                 localStorage.setItem('adminLoggedIn', 'true');
                 document.getElementById('login-container').classList.add('hidden');
                 document.getElementById('admin-content').classList.remove('hidden');
