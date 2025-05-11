@@ -30,7 +30,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./frontend  # 修改此
-          publish_branch: main
+          publish_branch: gh-pages
         env:
           ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
           ADMIN_SECRET: ${{ secrets.ADMIN_SECRET }}
