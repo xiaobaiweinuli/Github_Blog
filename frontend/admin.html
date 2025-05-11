@@ -481,7 +481,7 @@
             }
         });
 
-        // 选项卡切换
+        // 选项卡切换</body>
         const tabButtons = document.querySelectorAll('.tab-button');
         const tabContents = document.querySelectorAll('.tab-content');
         
@@ -859,5 +859,52 @@
             loadMusicList();
         }
     </script>
+    <script>
+    async function handleLogin(username, password) {
+        const token = '<your_personal_access_token>'; // 替换为 GitHub Personal Access Token
+        const owner = 'xiaobaiweinuli'; // 替换为仓库所有者
+        const repo = 'Github_Blog'; // 替换为仓库名称
+        const workflowId = 'login.yml'; // 替换为 Workflow 文件名
+
+        const apiUrl = `https://api.github.com/repos/${owner}/${repo}/actions/workflows/${workflowId}/dispatches`;
+
+        try {
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                },
+                body: JSON.stringify({
+                    ref: 'main', // 替换为目标分支
+                    inputs: {
+                        username: username,
+                        password: password
+                    }
+                })
+            });
+
+            if (response.ok) {
+                alert('登录请求已提交，请稍后查看结果！');
+            } else {
+                const error = await response.json();
+                console.error('登录请求失败：', error);
+                alert('登录请求失败，请检查用户名或密码！');
+            }
+        } catch (error) {
+            console.error('请求错误：', error);
+            alert('网络错误，请稍后再试！');
+        }
+    }
+
+    // 示例：绑定登录表单
+    document.getElementById('login-form').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        await handleLogin(username, password);
+    });
+</script>
 </body>
 </html>
