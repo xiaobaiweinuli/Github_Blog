@@ -1,4 +1,3 @@
-
 // github_blog_system/frontend/js/storage.js
 document.addEventListener('DOMContentLoaded', function() {
     // 检查管理员权限
@@ -6,6 +5,33 @@ document.addEventListener('DOMContentLoaded', function() {
         const username = localStorage.getItem('adminUsername');
         const password = localStorage.getItem('adminPassword');
         return username === process.env.ADMIN_USERNAME && password === process.env.ADMIN_SECRET;
+    }
+
+    // 管理员登录功能
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (username === process.env.ADMIN_USERNAME && password === process.env.ADMIN_SECRET) {
+                localStorage.setItem('adminLoggedIn', 'true');
+                localStorage.setItem('adminUsername', username);
+                localStorage.setItem('adminPassword', password);
+                document.getElementById('login-container').classList.add('hidden');
+                document.getElementById('admin-content').classList.remove('hidden');
+                
+                // 加载管理数据
+                loadArticlesList();
+                loadMoviesList();
+                loadBooksList();
+                loadMusicList();
+            } else {
+                alert('用户名或密码错误');
+            }
+        });
     }
 
     // 保存草稿功能
@@ -558,31 +584,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // 滚动到表单顶部
         window.scrollTo(0, 0);
     };
-
-    // 管理员登录功能
-    const loginForm = document.getElementById('login-form');
-    if (loginForm) {
-        loginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            
-            if (username === 'admin' && password === 'admin123') {
-                localStorage.setItem('adminLoggedIn', 'true');
-                document.getElementById('login-container').classList.add('hidden');
-                document.getElementById('admin-content').classList.remove('hidden');
-                
-                // 加载管理数据
-                loadArticlesList();
-                loadMoviesList();
-                loadBooksList();
-                loadMusicList();
-            } else {
-                alert('用户名或密码错误');
-            }
-        });
-    }
 
     // 检查是否已登录
     if (localStorage.getItem('adminLoggedIn') === 'true') {
