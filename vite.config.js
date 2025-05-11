@@ -9,6 +9,9 @@ export default defineConfig({
     emptyOutDir: true
   },
   define: {
-    'process.env': process.env
+    'process.env': {
+      ADMIN_USERNAME: JSON.stringify(process.env.ADMIN_USERNAME),
+      ADMIN_SECRET: JSON.stringify(process.env.ADMIN_SECRET)
+    }
   }
 })
