@@ -29,7 +29,7 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./frontend  # 修改此
+          publish_dir: ./frontend/build
           publish_branch: gh-pages
         env:
           ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
