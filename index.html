@@ -1,0 +1,910 @@
+
+<!-- github_blog_system/frontend/index.html -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GitHub博客系统</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.loli.net/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .dark-mode {
+            background-color: #1a202c;
+            color: #e2e8f0;
+        }
+        .dark-mode .bg-white {
+            background-color: #2d3748;
+        }
+        .dark-mode .text-gray-800 {
+            color: #e2e8f0;
+        }
+        .markdown-preview {
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            min-height: 300px;
+        }
+        .particles-js-canvas-el {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        .nav-link {
+            transition: transform 0.2s;
+        }
+        .nav-link:hover {
+            transform: translateY(-2px);
+        }
+        .tag-filter {
+            transition: all 0.2s;
+        }
+        .tag-filter:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .search-box {
+            transition: all 0.3s;
+        }
+        .search-box:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+        }
+        .search-result {
+            display: none;
+            position: absolute;
+            width: 100%;
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .dark-mode .search-result {
+            background-color: #2d3748;
+            border: 1px solid #4a5568;
+        }
+        .search-result.active {
+            display: block;
+        }
+        .search-tabs {
+            display: flex;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .dark-mode .search-tabs {
+            border-bottom-color: #4a5568;
+        }
+        .search-tab {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+        .search-tab.active {
+            border-bottom-color: #3b82f6;
+            color: #3b82f6;
+        }
+        .dark-mode .search-tab.active {
+            border-bottom-color: #60a5fa;
+            color: #60a5fa;
+        }
+        .search-result-item {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            cursor: pointer;
+        }
+        .dark-mode .search-result-item {
+            border-bottom-color: #4a5568;
+        }
+        .search-result-item:hover {
+            background-color: #f8fafc;
+        }
+        .dark-mode .search-result-item:hover {
+            background-color: #4a5568;
+        }
+        input, textarea, select {
+            caret-color: #1f2937 !important;
+        }
+        .dark-mode input,
+        .dark-mode textarea,
+        .dark-mode select {
+            caret-color: #e2e8f0 !important;
+        }
+        .article-card h3,
+        .movie-card h3,
+        .book-card h3,
+        .music-card h3 {
+            color: var(--title-color);
+        }
+        .dark-mode .article-card h3,
+        .dark-mode .movie-card h3,
+        .dark-mode .book-card h3,
+        .dark-mode .music-card h3 {
+            color: #e2e8f0;
+        }
+        .article-card p,
+        .movie-card p,
+        .book-card p,
+        .music-card p {
+            color: var(--text-color);
+        }
+        .dark-mode .article-card p,
+        .dark-mode .movie-card p,
+        .dark-mode .book-card p,
+        .dark-mode .music-card p {
+            color: #cbd5e0;
+        }
+        .movie-card, .book-card, .music-card {
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .movie-card:hover, .book-card:hover, .music-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .dark-mode .movie-card:hover, 
+        .dark-mode .book-card:hover, 
+        .dark-mode .music-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+        }
+        .link-available {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 4px 8px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .link-yes {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+        .link-no {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+        .dark-mode .link-yes {
+            background-color: rgba(16, 185, 129, 0.3);
+            color: #34d399;
+        }
+        .dark-mode .link-no {
+            background-color: rgba(239, 68, 68, 0.3);
+            color: #f87171;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div id="particles-js"></div>
+    <div class="container mx-auto px-4 py-8">
+        <header class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 dark:text-white">GitHub博客系统</h1>
+            <div class="flex items-center space-x-4">
+                <button id="darkModeToggle" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+                    🌙 深色模式
+                </button>
+                <a href="admin.html" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">
+                    ✏️ 写文章
+                </a>
+            </div>
+        </header>
+
+        <!-- 搜索框 -->
+        <div class="mb-8 relative">
+            <div class="relative">
+                <input type="text" id="search-input" placeholder="搜索文章、电影、书籍或音乐..." 
+                    class="w-full px-4 py-3 pl-10 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white search-box">
+                <div class="absolute left-3 top-3.5 text-gray-400 dark:text-gray-300">
+                    <i class="fas fa-search"></i>
+                </div>
+            </div>
+            <div id="search-result" class="search-result">
+                <div class="search-tabs">
+                    <div class="search-tab active" data-tab="articles">文章</div>
+                    <div class="search-tab" data-tab="movies">电影</div>
+                    <div class="search-tab" data-tab="books">书籍</div>
+                    <div class="search-tab" data-tab="music">音乐</div>
+                </div>
+                <div id="search-articles" class="search-result-content"></div>
+                <div id="search-movies" class="search-result-content hidden"></div>
+                <div id="search-books" class="search-result-content hidden"></div>
+                <div id="search-music" class="search-result-content hidden"></div>
+            </div>
+        </div>
+
+        <!-- 导航菜单 -->
+        <nav class="mb-8">
+            <ul class="flex flex-wrap gap-4">
+                <li><button id="show-articles" class="px-4 py-2 bg-white rounded-lg hover:bg-gray-100 transition nav-link dark:bg-gray-700 dark:hover:bg-gray-600">📝 文章列表</button></li>
+                <li><button id="show-tags" class="px-4 py-2 bg-white rounded-lg hover:bg-gray-100 transition nav-link dark:bg-gray-700 dark:hover:bg-gray-600">🏷️ 标签</button></li>
+                <li><button id="show-guestbook" class="px-4 py-2 bg-white rounded-lg hover:bg-gray-100 transition nav-link dark:bg-gray-700 dark:hover:bg-gray-600">📋 留言板</button></li>
+                <li><button id="show-archive" class="px-4 py-2 bg-white rounded-lg hover:bg-gray-100 transition nav-link dark:bg-gray-700 dark:hover:bg-gray-600">🗄️ 归档</button></li>
+                <li><button id="show-movies" class="px-4 py-2 bg-white rounded-lg hover:bg-gray-100 transition nav-link dark:bg-gray-700 dark:hover:bg-gray-600">🎬 电影收藏</button></li>
+                <li><button id="show-books" class="px-4 py-2 bg-white rounded-lg hover:bg-gray-100 transition nav-link dark:bg-gray-700 dark:hover:bg-gray-600">📚 读书清单</button></li>
+                <li><button id="show-music" class="px-4 py-2 bg-white rounded-lg hover:bg-gray-100 transition nav-link dark:bg-gray-700 dark:hover:bg-gray-600">🎵 音乐收藏</button></li>
+            </ul>
+        </nav>
+
+        <main>
+            <section id="articles" class="mb-12">
+                <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white">📝 最新文章</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="articles-container">
+                    <!-- 文章卡片将通过JavaScript动态生成 -->
+                </div>
+            </section>
+
+            <section id="tags" class="mb-12 hidden">
+                <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white">🏷️ 热门标签</h2>
+                <div class="flex flex-wrap gap-2" id="tags-container">
+                    <!-- 标签将通过JavaScript动态生成 -->
+                </div>
+            </section>
+
+            <section id="guestbook" class="mb-12 hidden">
+                <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white">📋 留言板</h2>
+                <div class="bg-white rounded-lg shadow-md p-6 dark:bg-gray-800">
+                    <p class="text-gray-600 dark:text-gray-300">欢迎来到留言板，请点击下方按钮查看留言。</p>
+                    <button id="view-guestbook" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+                        查看留言板
+                    </button>
+                </div>
+            </section>
+
+            <section id="archive" class="mb-12 hidden">
+                <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white">🗄️ 文章归档</h2>
+                <div class="bg-white rounded-lg shadow-md p-6 dark:bg-gray-800">
+                    <h3 class="text-xl font-bold mb-4">2025年</h3>
+                    <ul class="space-y-2" id="archive-list">
+                        <!-- 归档列表将通过JavaScript动态生成 -->
+                    </ul>
+                </div>
+            </section>
+
+            <section id="movies" class="mb-12 hidden">
+                <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white">🎬 电影收藏</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="movies-container">
+                    <!-- 电影卡片将通过JavaScript动态生成 -->
+                </div>
+            </section>
+
+            <section id="books" class="mb-12 hidden">
+                <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white">📚 读书清单</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="books-container">
+                    <!-- 书籍卡片将通过JavaScript动态生成 -->
+                </div>
+            </section>
+
+            <section id="music" class="mb-12 hidden">
+                <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white">🎵 音乐收藏</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="music-container">
+                    <!-- 音乐卡片将通过JavaScript动态生成 -->
+                </div>
+            </section>
+        </main>
+
+        <footer class="mt-12 py-6 border-t border-gray-200 text-center text-gray-600 dark:text-gray-400">
+            <p>© 2025 GitHub博客系统. 保留所有权利.</p>
+            <div class="mt-2">
+                <a href="#" class="text-blue-500 hover:text-blue-700 mx-2 dark:text-blue-400 dark:hover:text-blue-300" target="_blank">关于</a>
+                <a href="#" class="text-blue-500 hover:text-blue-700 mx-2 dark:text-blue-400 dark:hover:text-blue-300" target="_blank">隐私政策</a>
+                <a href="#" class="text-blue-500 hover:text-blue-700 mx-2 dark:text-blue-400 dark:hover:text-blue-300" target="_blank">联系我</a>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/storage.js"></script>
+    <script>
+        // 深色模式切换
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+        
+        if (localStorage.getItem('darkMode') === 'true' || 
+            (localStorage.getItem('darkMode') === null && prefersDarkScheme.matches)) {
+            document.body.classList.add('dark-mode');
+            darkModeToggle.textContent = '☀️ 浅色模式';
+        }
+        
+        darkModeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode);
+            darkModeToggle.textContent = isDarkMode ? '☀️ 浅色模式' : '🌙 深色模式';
+        });
+
+        // 粒子效果初始化
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: "#3B82F6" },
+                shape: { type: "circle" },
+                opacity: { value: 0.5, random: true },
+                size: { value: 3, random: true },
+                line_linked: { enable: true, distance: 150, color: "#3B82F6", opacity: 0.4, width: 1 },
+                move: { enable: true, speed: 2, direction: "none", random: true, straight: false, out_mode: "out" }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: { enable: true, mode: "grab" },
+                    onclick: { enable: true, mode: "push" }
+                }
+            }
+        });
+
+        // 加载文章
+        function loadArticles() {
+            const articlesContainer = document.getElementById('articles-container');
+            articlesContainer.innerHTML = '';
+            
+            const articles = JSON.parse(localStorage.getItem('articles') || '[]')
+                .filter(article => !article.isDraft)
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .slice(0, 8);
+            
+            if (articles.length === 0) {
+                articlesContainer.innerHTML = '<p class="col-span-full text-center py-8 text-gray-500 dark:text-gray-400">暂无文章</p>';
+                return;
+            }
+            
+            articles.forEach(article => {
+                const articleElement = document.createElement('article');
+                articleElement.className = 'bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition dark:bg-gray-800 cursor-pointer article-card';
+                articleElement.setAttribute('data-id', article.id);
+                articleElement.innerHTML = `
+                    <img src="${article.cover}" alt="${article.title}" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2 text-gray-800 dark:text-white">${article.title}</h3>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">${article.content.substring(0, 60)}...</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">${article.date}</span>
+                            <a href="sample-article.html?id=${article.id}" class="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">阅读更多 →</a>
+                        </div>
+                    </div>
+                `;
+                articleElement.addEventListener('click', (e) => {
+                    if (!e.target.closest('a')) {
+                        window.location.href = `sample-article.html?id=${article.id}`;
+                    }
+                });
+                articlesContainer.appendChild(articleElement);
+            });
+        }
+
+        // 加载标签
+        function loadTags() {
+            const tagsContainer = document.getElementById('tags-container');
+            tagsContainer.innerHTML = '';
+            
+            const articles = JSON.parse(localStorage.getItem('articles') || '[]')
+                .filter(article => !article.isDraft);
+            
+            if (articles.length === 0) {
+                tagsContainer.innerHTML = '<p class="w-full text-center py-8 text-gray-500 dark:text-gray-400">暂无标签</p>';
+                return;
+            }
+            
+            const tagCounts = {};
+            articles.forEach(article => {
+                if (article.tags && Array.isArray(article.tags)) {
+                    article.tags.forEach(tag => {
+                        tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+                    });
+                }
+            });
+            
+            if (Object.keys(tagCounts).length === 0) {
+                tagsContainer.innerHTML = '<p class="w-full text-center py-8 text-gray-500 dark:text-gray-400">暂无标签</p>';
+                return;
+            }
+            
+            Object.entries(tagCounts).forEach(([tag, count]) => {
+                const tagElement = document.createElement('button');
+                tagElement.className = 'px-3 py-1 bg-blue-100 text-blue-800 rounded-full hover:bg-blue-200 transition dark:bg-blue-900 dark:text-blue-200 tag-filter';
+                tagElement.textContent = `${tag} (${count})`;
+                tagElement.addEventListener('click', () => filterByTag(tag));
+                tagsContainer.appendChild(tagElement);
+            });
+        }
+
+        // 按标签过滤
+        function filterByTag(tag) {
+            const articles = JSON.parse(localStorage.getItem('articles') || '[]')
+                .filter(article => !article.isDraft && article.tags && article.tags.includes(tag));
+            
+            // 显示文章部分
+            showSection('articles');
+            
+            const articlesContainer = document.getElementById('articles-container');
+            articlesContainer.innerHTML = '';
+            
+            if (articles.length === 0) {
+                articlesContainer.innerHTML = `<p class="col-span-full text-center py-8 text-gray-500 dark:text-gray-400">没有找到带有"${tag}"标签的文章</p>`;
+                return;
+            }
+            
+            articles.forEach(article => {
+                const articleElement = document.createElement('article');
+                articleElement.className = 'bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition dark:bg-gray-800 cursor-pointer article-card';
+                articleElement.setAttribute('data-id', article.id);
+                articleElement.innerHTML = `
+                    <img src="${article.cover}" alt="${article.title}" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2 text-gray-800 dark:text-white">${article.title}</h3>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">${article.content.substring(0, 60)}...</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">${article.date}</span>
+                            <a href="sample-article.html?id=${article.id}" class="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">阅读更多 →</a>
+                        </div>
+                    </div>
+                `;
+                articleElement.addEventListener('click', (e) => {
+                    if (!e.target.closest('a')) {
+                        window.location.href = `sample-article.html?id=${article.id}`;
+                    }
+                });
+                articlesContainer.appendChild(articleElement);
+            });
+        }
+
+        // 加载电影
+        function loadMovies() {
+            const moviesContainer = document.getElementById('movies-container');
+            moviesContainer.innerHTML = '';
+            
+            const movies = JSON.parse(localStorage.getItem('movies') || '[]')
+                .sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            if (movies.length === 0) {
+                moviesContainer.innerHTML = '<p class="col-span-full text-center py-8 text-gray-500 dark:text-gray-400">暂无电影收藏</p>';
+                return;
+            }
+            
+            movies.forEach(movie => {
+                const movieElement = document.createElement('div');
+                movieElement.className = 'bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition dark:bg-gray-800 cursor-pointer movie-card relative';
+                movieElement.setAttribute('data-id', movie.id);
+                
+                // 添加链接状态标识
+                const hasValidLink = movie.url && movie.url.trim() !== '';
+                
+                movieElement.innerHTML = `
+                    ${hasValidLink 
+                        ? '<div class="link-available link-yes">有链接</div>' 
+                        : '<div class="link-available link-no">无链接</div>'
+                    }
+                    <img src="${movie.poster}" alt="${movie.title}" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2 text-gray-800 dark:text-white">${movie.title}</h3>
+                        <p class="text-gray-600 dark:text-gray-300 mb-1">导演: ${movie.director}</p>
+                        <p class="text-gray-600 dark:text-gray-300 mb-1">年份: ${movie.year}</p>
+                        ${movie.rating ? `<p class="text-gray-600 dark:text-gray-300 mb-4">评分: ${movie.rating}/10</p>` : ''}
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">${movie.date}</span>
+                        </div>
+                    </div>
+                `;
+                moviesContainer.appendChild(movieElement);
+            });
+        }
+
+        // 加载书籍
+        function loadBooks() {
+            const booksContainer = document.getElementById('books-container');
+            booksContainer.innerHTML = '';
+            
+            const books = JSON.parse(localStorage.getItem('books') || '[]')
+                .sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            if (books.length === 0) {
+                booksContainer.innerHTML = '<p class="col-span-full text-center py-8 text-gray-500 dark:text-gray-400">暂无书籍收藏</p>';
+                return;
+            }
+            
+            books.forEach(book => {
+                const bookElement = document.createElement('div');
+                bookElement.className = 'bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition dark:bg-gray-800 cursor-pointer book-card relative';
+                bookElement.setAttribute('data-id', book.id);
+                
+                // 添加链接状态标识
+                const hasValidLink = book.url && book.url.trim() !== '';
+                
+                bookElement.innerHTML = `
+                    ${hasValidLink 
+                        ? '<div class="link-available link-yes">有链接</div>' 
+                        : '<div class="link-available link-no">无链接</div>'
+                    }
+                    <img src="${book.cover}" alt="${book.title}" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2 text-gray-800 dark:text-white">${book.title}</h3>
+                        <p class="text-gray-600 dark:text-gray-300 mb-1">作者: ${book.author}</p>
+                        ${book.year ? `<p class="text-gray-600 dark:text-gray-300 mb-1">出版年份: ${book.year}</p>` : ''}
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">状态: ${book.status}</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">${book.date}</span>
+                        </div>
+                    </div>
+                `;
+                booksContainer.appendChild(bookElement);
+            });
+        }
+
+        // 加载音乐
+        function loadMusic() {
+            const musicContainer = document.getElementById('music-container');
+            musicContainer.innerHTML = '';
+            
+            const music = JSON.parse(localStorage.getItem('music') || '[]')
+                .sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            if (music.length === 0) {
+                musicContainer.innerHTML = '<p class="col-span-full text-center py-8 text-gray-500 dark:text-gray-400">暂无音乐收藏</p>';
+                return;
+            }
+            
+            music.forEach(m => {
+                const musicElement = document.createElement('div');
+                musicElement.className = 'bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition dark:bg-gray-800 cursor-pointer music-card relative';
+                musicElement.setAttribute('data-id', m.id);
+                
+                // 添加链接状态标识
+                const hasValidLink = m.url && m.url.trim() !== '';
+                
+                musicElement.innerHTML = `
+                    ${hasValidLink 
+                        ? '<div class="link-available link-yes">有链接</div>' 
+                        : '<div class="link-available link-no">无链接</div>'
+                    }
+                    <img src="${m.cover}" alt="${m.title}" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2 text-gray-800 dark:text-white">${m.title}</h3>
+                        <p class="text-gray-600 dark:text-gray-300 mb-1">艺术家: ${m.artist}</p>
+                        ${m.album ? `<p class="text-gray-600 dark:text-gray-300 mb-1">专辑: ${m.album}</p>` : ''}
+                        ${m.year ? `<p class="text-gray-600 dark:text-gray-300 mb-1">年份: ${m.year}</p>` : ''}
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">${m.date}</span>
+                        </div>
+                    </div>
+                `;
+                musicContainer.appendChild(musicElement);
+            });
+        }
+
+        // 加载归档
+        function loadArchive() {
+            const archiveList = document.getElementById('archive-list');
+            archiveList.innerHTML = '';
+            
+            const articles = JSON.parse(localStorage.getItem('articles') || '[]')
+                .filter(article => !article.isDraft);
+                
+            if (articles.length === 0) {
+                archiveList.innerHTML = '<p class="text-center py-4 text-gray-500 dark:text-gray-400">暂无文章归档</p>';
+                return;
+            }
+            
+            const archiveData = {};
+            
+            articles.forEach(article => {
+                const year = article.date.split('-')[0];
+                const month = article.date.split('-')[1];
+                
+                if (!archiveData[year]) {
+                    archiveData[year] = {};
+                }
+                
+                if (!archiveData[year][month]) {
+                    archiveData[year][month] = [];
+                }
+                
+                archiveData[year][month].push(article);
+            });
+            
+            // 按年月排序
+            const sortedYears = Object.keys(archiveData).sort((a, b) => b - a);
+            
+            sortedYears.forEach(year => {
+                const sortedMonths = Object.keys(archiveData[year]).sort((a, b) => b - a);
+                
+                sortedMonths.forEach(month => {
+                    const monthName = new Date(`${year}-${month}-01`).toLocaleString('zh-CN', { month: 'long' });
+                    const count = archiveData[year][month].length;
+                    
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <button class="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 archive-filter" data-year="${year}" data-month="${month}">
+                            ${year}年${monthName} (${count})
+                        </button>
+                    `;
+                    li.querySelector('.archive-filter').addEventListener('click', () => filterByArchive(year, month));
+                    archiveList.appendChild(li);
+                });
+            });
+        }
+
+        // 按归档过滤
+        function filterByArchive(year, month) {
+            const articles = JSON.parse(localStorage.getItem('articles') || '[]')
+                .filter(article => {
+                    const articleYear = article.date.split('-')[0];
+                    const articleMonth = article.date.split('-')[1];
+                    return !article.isDraft && 
+                           articleYear === year && 
+                           articleMonth === month;
+                });
+            
+            // 显示文章部分
+            showSection('articles');
+            
+            const articlesContainer = document.getElementById('articles-container');
+            articlesContainer.innerHTML = '';
+            
+            if (articles.length === 0) {
+                const monthName = new Date(`${year}-${month}-01`).toLocaleString('zh-CN', { month: 'long' });
+                articlesContainer.innerHTML = `<p class="col-span-full text-center py-8 text-gray-500 dark:text-gray-400">没有找到${year}年${monthName}的文章</p>`;
+                return;
+            }
+            
+            articles.forEach(article => {
+                const articleElement = document.createElement('article');
+                articleElement.className = 'bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition dark:bg-gray-800 cursor-pointer article-card';
+                articleElement.setAttribute('data-id', article.id);
+                articleElement.innerHTML = `
+                    <img src="${article.cover}" alt="${article.title}" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2 text-gray-800 dark:text-white">${article.title}</h3>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">${article.content.substring(0, 60)}...</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">${article.date}</span>
+                            <a href="sample-article.html?id=${article.id}" class="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">阅读更多 →</a>
+                        </div>
+                    </div>
+                `;
+                articleElement.addEventListener('click', (e) => {
+                    if (!e.target.closest('a')) {
+                        window.location.href = `sample-article.html?id=${article.id}`;
+                    }
+                });
+                articlesContainer.appendChild(articleElement);
+            });
+        }
+
+        // 切换显示部分
+        function showSection(sectionId) {
+            document.querySelectorAll('main > section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            document.getElementById(sectionId).classList.remove('hidden');
+            
+            // 根据显示的section加载相应内容
+            switch(sectionId) {
+                case 'articles':
+                    loadArticles();
+                    break;
+                case 'tags':
+                    loadTags();
+                    break;
+                case 'archive':
+                    loadArchive();
+                    break;
+                case 'movies':
+                    loadMovies();
+                    break;
+                case 'books':
+                    loadBooks();
+                    break;
+                case 'music':
+                    loadMusic();
+                    break;
+            }
+        }
+
+        // 搜索功能
+        const searchInput = document.getElementById('search-input');
+        const searchResult = document.getElementById('search-result');
+        const searchTabs = document.querySelectorAll('.search-tab');
+        
+        searchInput.addEventListener('input', function(e) {
+            const query = e.target.value.toLowerCase();
+            if (query.length < 2) {
+                searchResult.classList.remove('active');
+                return;
+            }
+            
+            searchResult.classList.add('active');
+            
+            // 搜索文章
+            const articles = JSON.parse(localStorage.getItem('articles') || '[]')
+                .filter(article => 
+                    !article.isDraft && (
+                        article.title.toLowerCase().includes(query) || 
+                        article.content.toLowerCase().includes(query) ||
+                        (article.tags && article.tags.some(tag => tag.toLowerCase().includes(query)))
+                    )
+                );
+            
+            // 搜索电影
+            const movies = JSON.parse(localStorage.getItem('movies') || '[]')
+                .filter(movie => 
+                    movie.title.toLowerCase().includes(query) || 
+                    movie.director.toLowerCase().includes(query) ||
+                    (movie.review && movie.review.toLowerCase().includes(query))
+                );
+            
+            // 搜索书籍
+            const books = JSON.parse(localStorage.getItem('books') || '[]')
+                .filter(book => 
+                    book.title.toLowerCase().includes(query) || 
+                    book.author.toLowerCase().includes(query) ||
+                    (book.review && book.review.toLowerCase().includes(query))
+                );
+            
+            // 搜索音乐
+            const music = JSON.parse(localStorage.getItem('music') || '[]')
+                .filter(m => 
+                    m.title.toLowerCase().includes(query) || 
+                    m.artist.toLowerCase().includes(query) ||
+                    (m.album && m.album.toLowerCase().includes(query))
+                );
+            
+            // 显示搜索结果
+            showSearchResults(articles, movies, books, music);
+        });
+        
+        // 搜索标签切换
+        searchTabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                searchTabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                const tabId = this.getAttribute('data-tab');
+                document.querySelectorAll('.search-result-content').forEach(content => {
+                    content.classList.add('hidden');
+                });
+                document.getElementById(`search-${tabId}`).classList.remove('hidden');
+            });
+        });
+
+        function showSearchResults(articles, movies, books, music) {
+            const articlesContainer = document.getElementById('search-articles');
+            const moviesContainer = document.getElementById('search-movies');
+            const booksContainer = document.getElementById('search-books');
+            const musicContainer = document.getElementById('search-music');
+            
+            // 清空所有结果
+            articlesContainer.innerHTML = '';
+            moviesContainer.innerHTML = '';
+            booksContainer.innerHTML = '';
+            musicContainer.innerHTML = '';
+            
+            // 显示文章结果
+            if (articles.length > 0) {
+                articles.forEach(article => {
+                    const item = document.createElement('div');
+                    item.className = 'search-result-item';
+                    item.innerHTML = `
+                        <h4 class="font-medium">${article.title}</h4>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">${article.date}</p>
+                    `;
+                    item.addEventListener('click', () => {
+                        window.location.href = `sample-article.html?id=${article.id}`;
+                        searchResult.classList.remove('active');
+                    });
+                    articlesContainer.appendChild(item);
+                });
+            } else {
+                articlesContainer.innerHTML = '<p class="p-4 text-gray-500 dark:text-gray-400">没有找到匹配的文章</p>';
+            }
+            
+            // 显示电影结果
+            if (movies.length > 0) {
+                movies.forEach(movie => {
+                    const item = document.createElement('div');
+                    item.className = 'search-result-item';
+                    item.innerHTML = `
+                        <h4 class="font-medium">${movie.title}</h4>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">导演: ${movie.director} · ${movie.year}</p>
+                    `;
+                    item.addEventListener('click', () => {
+                        if (movie.url) {
+                            window.handleExternalLink(movie.url);
+                        } else {
+                            alert('该电影暂无链接');
+                        }
+                        searchResult.classList.remove('active');
+                    });
+                    moviesContainer.appendChild(item);
+                });
+            } else {
+                moviesContainer.innerHTML = '<p class="p-4 text-gray-500 dark:text-gray-400">没有找到匹配的电影</p>';
+            }
+            
+            // 显示书籍结果
+            if (books.length > 0) {
+                books.forEach(book => {
+                    const item = document.createElement('div');
+                    item.className = 'search-result-item';
+                    item.innerHTML = `
+                        <h4 class="font-medium">${book.title}</h4>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">作者: ${book.author} · ${book.status}</p>
+                    `;
+                    item.addEventListener('click', () => {
+                        if (book.url) {
+                            window.handleExternalLink(book.url);
+                        } else {
+                            alert('该书籍暂无链接');
+                        }
+                        searchResult.classList.remove('active');
+                    });
+                    booksContainer.appendChild(item);
+                });
+            } else {
+                booksContainer.innerHTML = '<p class="p-4 text-gray-500 dark:text-gray-400">没有找到匹配的书籍</p>';
+            }
+            
+            // 显示音乐结果
+            if (music.length > 0) {
+                music.forEach(m => {
+                    const item = document.createElement('div');
+                    item.className = 'search-result-item';
+                    item.innerHTML = `
+                        <h4 class="font-medium">${m.title}</h4>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">艺术家: ${m.artist} ${m.year ? '· ' + m.year : ''}</p>
+                    `;
+                    item.addEventListener('click', () => {
+                        if (m.url) {
+                            window.handleExternalLink(m.url);
+                        } else {
+                            alert('该音乐暂无链接');
+                        }
+                        searchResult.classList.remove('active');
+                    });
+                    musicContainer.appendChild(item);
+                });
+            } else {
+                musicContainer.innerHTML = '<p class="p-4 text-gray-500 dark:text-gray-400">没有找到匹配的音乐</p>';
+            }
+            
+            // 默认显示文章结果
+            document.querySelector('.search-tab.active').click();
+        }
+
+        // 点击其他地方关闭搜索结果
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !searchResult.contains(e.target)) {
+                searchResult.classList.remove('active');
+            }
+        });
+
+        // 为导航菜单添加点击事件
+        document.getElementById('show-articles').addEventListener('click', () => showSection('articles'));
+        document.getElementById('show-tags').addEventListener('click', () => showSection('tags'));
+        document.getElementById('show-guestbook').addEventListener('click', () => showSection('guestbook'));
+        document.getElementById('show-archive').addEventListener('click', () => showSection('archive'));
+        document.getElementById('show-movies').addEventListener('click', () => showSection('movies'));
+        document.getElementById('show-books').addEventListener('click', () => showSection('books'));
+        document.getElementById('show-music').addEventListener('click', () => showSection('music'));
+
+        // 查看留言板按钮
+        document.getElementById('view-guestbook').addEventListener('click', () => {
+            window.open('guestbook.html', '_blank');
+        });
+
+        // 初始化加载所有内容
+        loadArticles();
+        loadTags();
+        loadMovies();
+        loadBooks();
+        loadMusic();
+        loadArchive();
+    </script>
+</body>
+</html>
