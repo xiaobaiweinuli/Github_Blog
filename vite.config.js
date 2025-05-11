@@ -10,8 +10,8 @@ export default defineConfig({
   },
   define: {
     'process.env': {
-      ADMIN_USERNAME: JSON.stringify(process.env.ADMIN_USERNAME),
-      ADMIN_SECRET: JSON.stringify(process.env.ADMIN_SECRET)
+      ADMIN_USERNAME: JSON.stringify(process.env.ADMIN_USERNAME || 'admin'),
+      ADMIN_SECRET: JSON.stringify(process.env.ADMIN_SECRET || 'HM.165sjsos')
     }
   }
 })
