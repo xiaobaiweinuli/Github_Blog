@@ -1,0 +1,22 @@
+txt
+<!-- github_blog_system/frontend/robots.txt -->
+User-agent: *
+Disallow: /admin.html
+Disallow: /guestbook.html
+Disallow: /sample-article.html
+Disallow: /js/
+Disallow: /css/
+
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+Sitemap: https://[your-github-username].github.io/sitemap.xml
