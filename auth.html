@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>认证处理中...</title>
     <style>
-        .loader {
+        。loader {
             border: 4px solid #f3f3f3;
             border-top: 4px solid #3498db;
             border-radius: 50%;
@@ -42,7 +42,7 @@
                 document.getElementById('loading').style.display = 'block';
 
                 // 调用 Cloudflare Worker
-                const response = await fetch('https://your-worker-name.xiaobaiweinuli.workers.dev/oauth/callback', {
+                const response = await fetch('https://github-oauth-proxy.bxiao.workers.dev/oauth/callback', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
