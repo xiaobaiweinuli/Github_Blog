@@ -5,6 +5,12 @@
     <title>管理员登录</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <!-- 定义全局环境变量 -->
+    <script type="module">
+      import.meta.env = {
+        VITE_GH_CLIENT_ID: import.meta.env.VITE_GH_CLIENT_ID || '',
+        VITE_GH_CLIENT_SECRET: import.meta.env.VITE_GH_CLIENT_SECRET || ''
+      };
+    </script>
     
 </head>
 <body class="h-screen flex items-center justify-center bg-gray-100">
