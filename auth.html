@@ -17,10 +17,6 @@
             }
 
             try {
-                // 检查环境变量是否正确定义
-                if (!'Ov23liYGqP6tjWqtRrQp' || !import.meta.env.VITE_GH_CLIENT_SECRET) {
-                    throw new Error('环境变量未正确定义，请检查登录页面');
-                }
                 
                 // 获取Access Token
                 const res = await fetch('https://github-oauth-proxy.bxiao.workers.dev/oauth/callback', {
