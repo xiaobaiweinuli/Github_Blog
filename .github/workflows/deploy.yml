@@ -1,68 +1,45 @@
-name: Secure Deployment
+name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [ "main" ]
-  workflow_dispatch:
-
-permissions:
-  contents: write
-  pages: write
-  id-token: write
+    branches: [ main ]
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      # 1. 检出代码
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-      # 2. 设置Node.js环境
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v3
         with:
-          node-version: '18'
-          cache: 'npm'
+          node-version: '16'
 
-      # 3. 安装依赖并构建前端
-      - name: Install and Build
-        run: |
-          cd frontend
-          npm install
-          npm run build
-        env:
-          NODE_ENV: production
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./frontend
 
-      # 4. 替换敏感信息
+      - name: Build
+        run: npm run build
+        working-directory: ./frontend
+
+      # 新增的敏感信息替换步骤 (关键修复点)
       - name: Replace Secrets
         env:
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
           ALLOWED_USER: ${{ secrets.ALLOWED_USER }}
         run: |
-          # 替换构建后的文件
-          sed -i "s/CLIENT_ID_PLACEHOLDER/$CLIENT_ID/g" frontend/*.html
-          sed -i "s/CLIENT_SECRET_PLACEHOLDER/$CLIENT_SECRET/g" frontend/auth.html
-          sed -i "s/ALLOWED_USER_PLACEHOLDER/$ALLOWED_USER/g" frontend/js/auth.js
+          # 注意路径要根据实际构建目录调整
+          sed -i "s/CLIENT_ID_PLACEHOLDER/$CLIENT_ID/g" frontend/build/*.html  # ← 关键路径修正
+          sed -i "s/CLIENT_SECRET_PLACEHOLDER/$CLIENT_SECRET/g" frontend/build/auth.html
+          sed -i "s/ALLOWED_USER_PLACEHOLDER/$ALLOWED_USER/g" frontend/build/static/js/*.js  # ← 匹配打包后的JS文件
 
-      # 5. 配置GitHub Pages
-      - name: Setup Pages
-        uses: actions/configure-pages@v3
-
-      # 6. 上传制品
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          path: 'frontend'
-
-  deploy:
-    needs: build-and-deploy
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v2
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./frontend/build  # 必须与替换后的路径一致
+          publish_branch: gh-pages
