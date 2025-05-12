@@ -18,7 +18,7 @@
 
     <script>
         function startOAuth() {
-            const clientId = 'CLIENT_ID_PLACEHOLDER'; // Actions自动替换
+            const clientId = import.meta.env.VITE_GH_CLIENT_ID;
             const redirectUri = encodeURIComponent(window.location.origin + '/Github_Blog/auth.html');
             window.location = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=read:user`;
         }
