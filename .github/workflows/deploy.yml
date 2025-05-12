@@ -20,7 +20,7 @@ jobs:
 
       # 2. 设置Node.js环境
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
@@ -54,7 +54,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
-          path: 'frontend/dist/'
+          path: 'frontend'
 
   deploy:
     needs: build-and-deploy
