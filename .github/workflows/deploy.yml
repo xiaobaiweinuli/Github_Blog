@@ -42,9 +42,9 @@ jobs:
           ALLOWED_USER: ${{ secrets.ALLOWED_USER }}
         run: |
           # 替换构建后的文件
-          sed -i "s/CLIENT_ID_PLACEHOLDER/$CLIENT_ID/g" frontend/dist/*.html
-          sed -i "s/CLIENT_SECRET_PLACEHOLDER/$CLIENT_SECRET/g" frontend/dist/auth.html
-          sed -i "s/ALLOWED_USER_PLACEHOLDER/$ALLOWED_USER/g" frontend/dist/js/auth.js
+          sed -i "s/CLIENT_ID_PLACEHOLDER/$CLIENT_ID/g" frontend/*.html
+          sed -i "s/CLIENT_SECRET_PLACEHOLDER/$CLIENT_SECRET/g" frontend/auth.html
+          sed -i "s/ALLOWED_USER_PLACEHOLDER/$ALLOWED_USER/g" frontend/js/auth.js
 
       # 5. 配置GitHub Pages
       - name: Setup Pages
