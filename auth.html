@@ -18,7 +18,7 @@
 
             try {
                 // 检查环境变量是否正确定义
-                if (!import.meta.env.VITE_GH_CLIENT_ID || !import.meta.env.VITE_GH_CLIENT_SECRET) {
+                if (!'Ov23liYGqP6tjWqtRrQp' || !import.meta.env.VITE_GH_CLIENT_SECRET) {
                     throw new Error('环境变量未正确定义，请检查登录页面');
                 }
                 
@@ -30,7 +30,7 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        client_id: Ov23liYGqP6tjWqtRrQp，
+                        client_id: 'Ov23liYGqP6tjWqtRrQp',
                         client_secret: import.meta.env.VITE_GH_CLIENT_SECRET,
                         code: code
                     })
