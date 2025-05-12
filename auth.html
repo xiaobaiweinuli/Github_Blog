@@ -2,53 +2,118 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>认证中...</title>
-    <!-- 定义全局环境变量 -->
-    
+    <title>认证处理中...</title>
+    <style>
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
+    <div id="loading">
+        <div class="loader"></div>
+        <p style="text-align: center">正在验证身份，请稍候...</p>
+    </div>
+
     <script type="module">
         (async () => {
-            const code = new URLSearchParams(window.location.search).get('code');
+            // 获取授权码
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            
+            // 基础验证
             if (!code) {
-                alert('无效的认证请求');
-                window.location.href = '/Github_Blog/login.html';
-                return;
+                showError('无效的认证请求：缺少授权码');
+                return redirectToLogin();
             }
 
             try {
-                
-                // 获取Access Token
-                const res = await fetch('https://github-oauth-proxy.bxiao.workers.dev/oauth/callback', {
+                // 显示加载状态
+                document.getElementById('loading').style.display = 'block';
+
+                // 调用 Cloudflare Worker
+                const response = await fetch('https://your-worker-name.xiaobaiweinuli.workers.dev/oauth/callback', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ code: "从GitHub获取的code" })
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Request-Source': 'Github_Blog' // 自定义安全头
+                    },
+                    body: JSON.stringify({ code })
                 });
-                
-                const tokenData = await tokenRes.json();
-                if (!tokenData.access_token) throw new Error('获取Token失败');
+
+                // 处理 HTTP 错误
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `请求失败 (${response.status})`);
+                }
+
+                // 解析有效数据
+                const { user, token, expires_in } = await response.json();
 
                 // 验证用户身份
-                const userRes = await fetch('https://api.github.com/user', {
-                    headers: { 'Authorization': `Bearer ${tokenData.access_token}` }
-                });
-                
-                const userData = await userRes.json();
-                if (userData.login !== 'YOUR_GITHUB_USERNAME') throw new Error('无访问权限');
+                if (!user || user.login !== 'xiaobaiweinuli') {
+                    throw new Error('无访问权限：非授权用户');
+                }
 
                 // 存储认证信息
                 localStorage.setItem('gh_auth', JSON.stringify({
-                    token: tokenData.access_token,
-                    expires: Date.now() + 3600000 // 1小时有效期
+                    user,
+                    token,
+                    expires: Date.now() + (expires_in * 1000)
                 }));
-                
+
+                // 跳转到管理界面
                 window.location.href = '/Github_Blog/admin.html';
+
             } catch (error) {
-                console.error('认证失败:', error);
-                alert('认证失败: ' + error.message);
-                window.location.href = '/Github_Blog/login.html';
+                console.error('认证流程错误:', error);
+                showError(`认证失败: ${error.message}`);
+                redirectToLogin();
+            } finally {
+                document.getElementById('loading').style.display = 'none';
             }
         })();
+
+        // 显示错误提示
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.style = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                padding: 15px 30px;
+                background: #ffebee;
+                color: #b71c1c;
+                border-radius: 5px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                z-index: 1000;
+            `;
+            errorDiv.textContent = message;
+            document.body.appendChild(errorDiv);
+            
+            // 5秒后自动消失
+            setTimeout(() => {
+                errorDiv.remove();
+            }, 5000);
+        }
+
+        // 跳转到登录页
+        function redirectToLogin() {
+            setTimeout(() => {
+                window.location.href = '/Github_Blog/login.html';
+            }, 3000);
+        }
     </script>
 </body>
 </html>
