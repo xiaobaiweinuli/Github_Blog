@@ -10,38 +10,27 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
-      - name: Setup Node
-        uses: actions/setup-node@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: '16'
+          node-version: '18'
           
-      - name: Install dependencies
-        run: |
-          npm install --unsafe-perm  # 修复权限问题
-        working-directory: ./frontend
+      - name: Install Vite globally
+        run: npm install -g vite
         
-      - name: Build
-        run: |
-          npx vite build  # 显式使用本地安装的vite
-        working-directory: ./frontend
-
-      # 新增的敏感信息替换步骤 (关键修复点)
-      - name: Replace Secrets
+      - name: Install dependencies
+        run: npm install
+        
+      - name: Build project
         env:
-          CLIENT_ID: ${{ secrets.CLIENT_ID }}
-          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
-          ALLOWED_USER: ${{ secrets.ALLOWED_USER }}
-        run: |
-          # 注意路径要根据实际构建目录调整
-          sed -i "s/CLIENT_ID_PLACEHOLDER/$CLIENT_ID/g" frontend/build/*.html  # ← 关键路径修正
-          sed -i "s/CLIENT_SECRET_PLACEHOLDER/$CLIENT_SECRET/g" frontend/build/auth.html
-          sed -i "s/ALLOWED_USER_PLACEHOLDER/$ALLOWED_USER/g" frontend/build/static/js/*.js  # ← 匹配打包后的JS文件
-
-      - name: Deploy
+          VITE_GH_CLIENT_SECRET: ${{ secrets.VITE_GH_CLIENT_SECRET }}
+        run: npm run build
+        
+      - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./frontend/dist  # 确保指向正确的构建输出目录
+          publish_dir: ./dist
           publish_branch: gh-pages
