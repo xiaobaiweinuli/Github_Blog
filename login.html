@@ -16,12 +16,13 @@
         </button>
     </div>
 
-    <script>
+    <script type="module">
         function startOAuth() {
             const clientId = import.meta.env.VITE_GH_CLIENT_ID;
             const redirectUri = encodeURIComponent(window.location.origin + '/Github_Blog/auth.html');
             window.location = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=read:user`;
         }
+        window.startOAuth = startOAuth;
     </script>
 </body>
 </html>
