@@ -21,10 +21,6 @@
 
     <script type="module">
         function startOAuth() {
-            if (!'Ov23liYGqP6tjWqtRrQp') {
-            alert('请确保已正确配置GitHub OAuth客户端ID');
-            return;
-        }
             const clientId = 'Ov23liYGqP6tjWqtRrQp';
             const redirectUri = encodeURIComponent(
               window.location.origin + '/Github_Blog/auth.html'
