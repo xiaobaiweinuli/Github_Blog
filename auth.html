@@ -23,17 +23,10 @@
                 }
                 
                 // 获取Access Token
-                const tokenRes = await fetch('https://github.com/login/oauth/access_token', {
+                const res = await fetch('https://your-worker-name.xiaobaiweinuli.workers.dev/oauth/callback', {
                     method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        client_id: 'Ov23liYGqP6tjWqtRrQp',
-                        client_secret: import.meta.env.VITE_GH_CLIENT_SECRET,
-                        code: code
-                    })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code: "从GitHub获取的code" })
                 });
                 
                 const tokenData = await tokenRes.json();
