@@ -3,6 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>认证中...</title>
+    <!-- 定义全局环境变量 -->
+    <script>
+      window.__ENV__ = window.__ENV__ || {};
+      window.__ENV__.VITE_GH_CLIENT_ID = "Ov23liYGqP6tjWqtRrQp"; // GitHub OAuth Client ID
+      window.__ENV__.VITE_GH_CLIENT_SECRET = "YOUR_CLIENT_SECRET"; // 请替换为实际的GitHub OAuth Client Secret
+    </script>
 </head>
 <body>
     <script type="module">
@@ -15,6 +21,11 @@
             }
 
             try {
+                // 检查环境变量是否正确定义
+                if (!window.__ENV__ || !window.__ENV__.VITE_GH_CLIENT_ID || !window.__ENV__.VITE_GH_CLIENT_SECRET) {
+                    throw new Error('环境变量未正确定义，请检查登录页面');
+                }
+                
                 // 获取Access Token
                 const tokenRes = await fetch('https://github.com/login/oauth/access_token', {
                     method: 'POST',
