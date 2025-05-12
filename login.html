@@ -18,17 +18,20 @@
             使用GitHub账号登录
         </button>
     </div>
-
     <script type="module">
         function startOAuth() {
-            if (!import.meta.env.VITE_GH_CLIENT_ID) {
-                alert('请确保已正确配置GitHub OAuth环境变量');
+            // 从环境变量中获取 clientId
+            const clientId = import.meta.env.VITE_GH_CLIENT_ID;
+            if (!clientId) {
+                console.error("Client ID 未定义！");
                 return;
             }
-            const clientId = import.meta.env.VITE_GH_CLIENT_ID;
+
             const redirectUri = encodeURIComponent(
-              window.location.origin + '/Github_Blog/auth.html'
+                window.location.origin + '/Github_Blog/auth.html'
             );
+
+            // 重定向到 GitHub OAuth
             window.location = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=read:user`;
         }
         window.startOAuth = startOAuth;
