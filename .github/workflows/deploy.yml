@@ -1,36 +1,68 @@
-name: Deploy to GitHub Pages
+name: Secure Deployment
 
 on:
   push:
-    branches: [ main ]
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
-      - uses: actions/checkout@v3
-      
+      # 1. 检出代码
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 2. 设置Node.js环境
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
-          
-      - name: Install dependencies
-        run: npm install
-        working-directory: ./frontend
-        
-      - name: Build
-        run: npm run build
-        working-directory: ./frontend
-        
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./frontend
-          publish_branch: gh-pages
+          node-version: '18'
+          cache: 'npm'
+
+      # 3. 安装依赖并构建前端
+      - name: Install and Build
+        run: |
+          cd frontend
+          npm install
+          npm run build
         env:
-          ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
-          ADMIN_SECRET: ${{ secrets.ADMIN_SECRET }}
+          NODE_ENV: production
+
+      # 4. 替换敏感信息
+      - name: Replace Secrets
+        env:
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          ALLOWED_USER: ${{ secrets.ALLOWED_USER }}
+        run: |
+          # 替换构建后的文件
+          sed -i "s/CLIENT_ID_PLACEHOLDER/$CLIENT_ID/g" frontend/dist/*.html
+          sed -i "s/CLIENT_SECRET_PLACEHOLDER/$CLIENT_SECRET/g" frontend/dist/auth.html
+          sed -i "s/ALLOWED_USER_PLACEHOLDER/$ALLOWED_USER/g" frontend/dist/js/auth.js
+
+      # 5. 配置GitHub Pages
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+
+      # 6. 上传制品
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: 'frontend/dist/'
+
+  deploy:
+    needs: build-and-deploy
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
