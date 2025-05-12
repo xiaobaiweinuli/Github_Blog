@@ -46,7 +46,7 @@ jobs:
           sed -i "s/CLIENT_SECRET_PLACEHOLDER/$CLIENT_SECRET/g" frontend/auth.html
           sed -i "s/ALLOWED_USER_PLACEHOLDER/$ALLOWED_USER/g" frontend/js/auth.js
 
-      # 5. 配置GitHub Pages
+      # 5. 配置GitHub GitHub Pages
       - name: Setup Pages
         uses: actions/configure-pages@v3
 
