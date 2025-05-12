@@ -4,45 +4,34 @@
     <meta charset="UTF-8">
     <title>管理员登录</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <!-- 定义全局环境变量 -->
+    
+    
 </head>
 <body class="h-screen flex items-center justify-center bg-gray-100">
     <div class="bg-white p-8 rounded-lg shadow-lg text-center">
         <h1 class="text-2xl font-bold mb-4">博客管理系统</h1>
-        <!-- 移除 onclick 属性，改用事件监听器 -->
         <button 
-            id="loginButton"
+            onclick="startOAuth()"
             class="bg-gray-800 text-white px-6 py-2 rounded-md hover:bg-gray-700 transition"
         >
-            使用 GitHub 账号登录
+            使用GitHub账号登录
         </button>
     </div>
 
     <script type="module">
-        // 确保在模块作用域内定义函数
-        const startOAuth = () => {
-            // 添加调试信息
-            console.log('环境变量:', import.meta.env);
-            
-            const clientId = import.meta.env.VITE_GH_CLIENT_ID;
-            console.log('Client ID:', clientId);
-
-            if (!clientId) {
-                console.error("Client ID 未定义！请检查环境变量配置。");
-                return;
-            }
-
+        function startOAuth() {
+            if (!'Ov23liYGqP6tjWqtRrQp') {
+            alert('请确保已正确配置GitHub OAuth客户端ID');
+            return;
+        }
+            const clientId = 'Ov23liYGqP6tjWqtRrQp';
             const redirectUri = encodeURIComponent(
-                window.location.origin + '/Github_Blog/auth.html'
+              window.location.origin + '/Github_Blog/auth.html'
             );
-
-            const authUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=read:user`;
-            console.log('Auth URL:', authUrl);
-
-            window.location = authUrl;
-        };
-
-        // 使用事件监听器绑定点击事件
-        document.getElementById('loginButton').addEventListener('click', startOAuth);
+            window.location = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=read:user`;
+        }
+        window.startOAuth = startOAuth;
     </script>
 </body>
 </html>
