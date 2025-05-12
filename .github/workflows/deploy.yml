@@ -11,31 +11,19 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v3
-
+      
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: '18'  # 推荐使用 LTS 版本
-          cache: 'npm'        # 启用缓存
-
-      - name: Fix directory permissions  # 新增关键修复步骤
-        run: sudo chown -R $USER:$USER ./frontend
-
+          node-version: '16'
+          
       - name: Install dependencies
-        run: |
-          cd frontend
-          npm ci --unsafe-perm  # 关键参数
-        env:
-          NODE_ENV: production
-
-      - name: Fix binary permissions  # 新增权限修复
-        run: chmod -R +x frontend/node_modules/.bin
-
+        run: npm install
+        working-directory: ./frontend
+        
       - name: Build
         run: npm run build
         working-directory: ./frontend
-
-      # 后续的敏感信息替换和部署步骤...
 
       # 新增的敏感信息替换步骤 (关键修复点)
       - name: Replace Secrets
@@ -53,5 +41,5 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./frontend/build  # 必须与替换后的路径一致
+          publish_dir: ./frontend
           publish_branch: gh-pages
