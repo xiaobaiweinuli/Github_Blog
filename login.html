@@ -8,8 +8,9 @@
 <body class="h-screen flex items-center justify-center bg-gray-100">
     <div class="bg-white p-8 rounded-lg shadow-lg text-center">
         <h1 class="text-2xl font-bold mb-4">博客管理系统</h1>
+        <!-- 移除 onclick 属性，改用事件监听器 -->
         <button 
-            onclick="startOAuth()"
+            id="loginButton"
             class="bg-gray-800 text-white px-6 py-2 rounded-md hover:bg-gray-700 transition"
         >
             使用 GitHub 账号登录
@@ -17,12 +18,16 @@
     </div>
 
     <script type="module">
-        function startOAuth() {
-            // 从 Vite 注入的环境变量中获取 clientId
+        // 确保在模块作用域内定义函数
+        const startOAuth = () => {
+            // 添加调试信息
+            console.log('环境变量:', import.meta.env);
+            
             const clientId = import.meta.env.VITE_GH_CLIENT_ID;
+            console.log('Client ID:', clientId);
 
             if (!clientId) {
-                console.error("Client ID 未定义！");
+                console.error("Client ID 未定义！请检查环境变量配置。");
                 return;
             }
 
@@ -30,10 +35,14 @@
                 window.location.origin + '/Github_Blog/auth.html'
             );
 
-            // 跳转到 GitHub OAuth 页面
-            window.location = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=read:user`;
-        }
-        window.startOAuth = startOAuth;
+            const authUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=read:user`;
+            console.log('Auth URL:', authUrl);
+
+            window.location = authUrl;
+        };
+
+        // 使用事件监听器绑定点击事件
+        document.getElementById('loginButton').addEventListener('click', startOAuth);
     </script>
 </body>
 </html>
