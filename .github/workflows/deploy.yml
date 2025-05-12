@@ -18,11 +18,13 @@ jobs:
           node-version: '16'
           
       - name: Install dependencies
-        run: npm install
+        run: |
+          npm install --unsafe-perm  # 修复权限问题
         working-directory: ./frontend
         
       - name: Build
-        run: npm run build
+        run: |
+          npx vite build  # 显式使用本地安装的vite
         working-directory: ./frontend
 
       # 新增的敏感信息替换步骤 (关键修复点)
@@ -41,5 +43,5 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./frontend
+          publish_dir: ./frontend/dist  # 确保指向正确的构建输出目录
           publish_branch: gh-pages
