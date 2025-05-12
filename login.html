@@ -6,9 +6,9 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <!-- 定义全局环境变量 -->
     <script type="module">
-      import.meta.env = {
-        VITE_GH_CLIENT_ID: import.meta.env.VITE_GH_CLIENT_ID || '',
-        VITE_GH_CLIENT_SECRET: import.meta.env.VITE_GH_CLIENT_SECRET || ''
+      window.__ENV__ = {
+        VITE_GH_CLIENT_ID: window.__ENV__?.VITE_GH_CLIENT_ID || '',
+        VITE_GH_CLIENT_SECRET: window.__ENV__?.VITE_GH_CLIENT_SECRET || ''
       };
     </script>
     
@@ -26,7 +26,7 @@
 
     <script type="module">
         function startOAuth() {
-            const clientId = import.meta.env.VITE_GH_CLIENT_ID;
+            const clientId = window.__ENV__?.VITE_GH_CLIENT_ID;
             const redirectUri = encodeURIComponent(
               window.location.origin + '/Github_Blog/auth.html'
             );
