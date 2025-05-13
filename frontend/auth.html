@@ -25,7 +25,7 @@
                 // 获取Access Token
                 const workersUrl = 'https://github-oauth-proxy.bxiao.workers.dev'; // 实际的Workers URL
             const state = crypto.randomUUID();
-                document.cookie = `gh_auth_state=${state}; path=/; max-age=3600`;
+                document.cookie = `gh_auth_state=${state}; Path=/; Secure; SameSite=Lax; Max-Age=3600`;
                 const tokenRes = await fetch(`${workersUrl}/auth/token?state=${state}`, {
                 method: 'POST',
                 headers: {
@@ -51,7 +51,7 @@
                 const userData = await userRes.json();
                 const savedState = document.cookie.split('; ').find(row => row.startsWith('gh_auth_state='))?.split('=')[1];
                 if (state !== savedState) throw new Error('无效的state参数');
-                if (userData.login !== 'YOUR_GITHUB_USERNAME') throw new Error('无访问权限');
+                if (!import.meta.env.VITE_ALLOWED_USERS?.split(',').includes(userData.login)) throw new Error('无访问权限');
 
                 // 存储认证信息
                 localStorage.setItem('gh_auth', JSON.stringify({

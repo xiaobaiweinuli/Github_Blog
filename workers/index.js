@@ -4,7 +4,17 @@ addEventListener('fetch', (event) => {
 
 async function handleRequest(request) {
   const url = new URL(request.url);
-  const headers = new Headers();
+  const headers = new Headers({
+    'Access-Control-Allow-Origin': 'https://bxiao.github.io',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Credentials': 'true'
+  });
+
+  // 处理预检请求
+  if (request.method === 'OPTIONS') {
+    return new Response(null, { headers });
+  }
 
   // 处理初始授权请求
   if (url.pathname === '/') {
@@ -27,11 +37,11 @@ async function handleRequest(request) {
     const savedState = cookies?.split('; ').find(c => c.trim().startsWith('github_state='))?.split('=')[1]?.trim();
 
     if (!code) {
-      return new Response('缺少code参数', { status: 400 });
+      return new Response(JSON.stringify({ error: 'missing_code' }), { status: 400, headers });
     }
     if (!state || !savedState || state !== savedState) {
       headers.set('Set-Cookie', 'github_state=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT');
-      return new Response('无效的state参数', { status: 400 });
+      return new Response(JSON.stringify({ error: 'invalid_state' }), { status: 400, headers });
     }
     headers.set('Set-Cookie', 'github_state=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT');
 
