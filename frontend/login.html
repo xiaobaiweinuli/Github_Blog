@@ -27,8 +27,11 @@
             // 保存state到cookie，5分钟有效期
             document.cookie = `gh_oauth_state=${state}; Path=/; Secure; SameSite=Lax; Max-Age=300`;
             
+            // 导入OAUTH_PROXY_URL常量
+            const OAUTH_PROXY_URL = "https://github-oauth-proxy.bxiao.workers.dev/";
+            
             // 重定向到授权端点
-            const authorizeUrl = `/Github_Blog/authorize?` + new URLSearchParams({
+            const authorizeUrl = `${OAUTH_PROXY_URL}authorize?` + new URLSearchParams({
                 response_type: 'code',
                 client_id: 'github_blog_client',
                 redirect_uri: window.location.origin + '/Github_Blog/auth.html',

@@ -100,7 +100,12 @@
 
 ### 步骤四：修改前端配置
 
-1. 在项目的`frontend/js/auth.js`文件中，找到以下代码行：
+1. 在项目的以下文件中找到并修改Cloudflare Workers URL：
+   - `frontend/js/auth.js`
+   - `frontend/auth.html`
+   - `frontend/login.html`
+
+   找到以下代码行：
 
    ```javascript
    const OAUTH_PROXY_URL = "https://github-oauth-proxy.bxiao.workers.dev/";
@@ -111,6 +116,8 @@
    ```javascript
    const OAUTH_PROXY_URL = "https://your-worker-name.your-username.workers.dev/";
    ```
+
+   **注意**：确保在所有文件中都进行了修改，这对于OAuth认证流程正常工作至关重要。
 
 ### 步骤五：安装依赖并构建项目
 
@@ -205,6 +212,11 @@ https://your-username.github.io/Github_Blog
 2. 确认回调URL是否与实际部署URL一致
 3. 检查Cloudflare Workers环境变量是否正确设置
 4. 确认你的GitHub用户名在`ALLOWED_USERS`环境变量中
+5. 确保所有前端文件中的`OAUTH_PROXY_URL`已正确设置为你的Cloudflare Workers URL
+   - 检查`frontend/js/auth.js`
+   - 检查`frontend/auth.html`
+   - 检查`frontend/login.html`
+6. 检查浏览器控制台是否有404错误，如果有`/Github_Blog/authorize`的404错误，说明前端代码中的认证URL配置有误
 
 ### Cloudflare Workers相关问题
 
