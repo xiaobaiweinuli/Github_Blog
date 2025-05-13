@@ -22,7 +22,9 @@
     <script type="module">
         function startOAuth() {
         // 通过Workers中间层启动OAuth流程
-        window.location = `https://github-oauth-proxy.bxiao.workers.dev`;
+        const state = crypto.randomUUID();
+    document.cookie = `gh_oauth_state=${state}; Path=/; Secure; SameSite=Lax; Max-Age=300`;
+    window.location = `https://github-oauth-proxy.bxiao.workers.dev?state=${state}`;
     }
     window.startOAuth = startOAuth;
     </script>
