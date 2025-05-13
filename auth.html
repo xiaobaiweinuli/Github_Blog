@@ -18,13 +18,15 @@
 
             try {
                 // 检查环境变量是否正确定义
-                if (!'Ov23liYGqP6tjWqtRrQp' || !import.meta.env.VITE_GH_CLIENT_SECRET) {
+                if (!import.meta.env.VITE_GH_CLIENT_ID || !import.meta.env.VITE_GH_CLIENT_SECRET) {
                     throw new Error('环境变量未正确定义，请检查登录页面');
                 }
                 
                 // 获取Access Token
                 const workersUrl = 'https://github-oauth-proxy.bxiao.workers.dev'; // 实际的Workers URL
-            const tokenRes = await fetch(`${workersUrl}/auth/token`, {
+            const state = crypto.randomUUID();
+                document.cookie = `gh_auth_state=${state}; path=/; max-age=3600`;
+                const tokenRes = await fetch(`${workersUrl}/auth/token?state=${state}`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -47,6 +49,8 @@
                 });
                 
                 const userData = await userRes.json();
+                const savedState = document.cookie.split('; ').find(row => row.startsWith('gh_auth_state='))?.split('=')[1];
+                if (state !== savedState) throw new Error('无效的state参数');
                 if (userData.login !== 'YOUR_GITHUB_USERNAME') throw new Error('无访问权限');
 
                 // 存储认证信息
