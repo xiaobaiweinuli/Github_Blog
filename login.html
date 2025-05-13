@@ -21,12 +21,25 @@
 
     <script type="module">
         function startOAuth() {
-        // 通过Workers中间层启动OAuth流程
-        const state = crypto.randomUUID();
-    document.cookie = `gh_oauth_state=${state}; Path=/; Secure; SameSite=Lax; Max-Age=300`;
-    window.location = `https://github-oauth-proxy.bxiao.workers.dev?state=${state}`;
-    }
-    window.startOAuth = startOAuth;
+            // 生成随机state参数防止CSRF攻击
+            const state = crypto.randomUUID();
+            
+            // 保存state到cookie，5分钟有效期
+            document.cookie = `gh_oauth_state=${state}; Path=/; Secure; SameSite=Lax; Max-Age=300`;
+            
+            // 重定向到授权端点
+            const authorizeUrl = `/Github_Blog/authorize?` + new URLSearchParams({
+                response_type: 'code',
+                client_id: 'github_blog_client',
+                redirect_uri: window.location.origin + '/Github_Blog/auth.html',
+                state: state,
+                scope: 'read:user'
+            }).toString();
+            
+            window.location.href = authorizeUrl;
+        }
+        
+        window.startOAuth = startOAuth;
     </script>
 </body>
 </html>
