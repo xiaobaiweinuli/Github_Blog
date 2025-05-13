@@ -6,6 +6,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <!-- 定义全局环境变量 -->
     
+    
 </head>
 <body class="h-screen flex items-center justify-center bg-gray-100">
     <div class="bg-white p-8 rounded-lg shadow-lg text-center">
@@ -20,11 +21,9 @@
 
     <script type="module">
         function startOAuth() {
-            const clientId = import.meta.env.VITE_GH_CLIENT_ID;
-            const redirectUri = encodeURIComponent(
-              window.location.origin + '/Github_Blog/auth.html'
-            );
-            window.location = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=read:user`;
+            // 通过Workers中间层启动OAuth流程
+            window.location = `${window.location.origin}/workers`;
+        }
         }
         window.startOAuth = startOAuth;
     </script>

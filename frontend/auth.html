@@ -18,22 +18,22 @@
 
             try {
                 // 检查环境变量是否正确定义
-                if (!import.meta.env.VITE_GH_CLIENT_ID || !import.meta.env.VITE_GH_CLIENT_SECRET) {
+                if (!'Ov23liYGqP6tjWqtRrQp' || !import.meta.env.VITE_GH_CLIENT_SECRET) {
                     throw new Error('环境变量未正确定义，请检查登录页面');
                 }
                 
                 // 获取Access Token
-                const tokenRes = await fetch('https://github.com/login/oauth/access_token', {
+                const workersUrl = 'https://your-worker-name.your-account.workers.dev'; // 替换为实际的Workers URL
+            const tokenRes = await fetch(`${workersUrl}/auth/token`, {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        client_id: import.meta.env.VITE_GH_CLIENT_ID,
-                        client_secret: import.meta.env.VITE_GH_CLIENT_SECRET,
                         code: code
-                    })
+                    })}]}}}
+
                 });
                 
                 const tokenData = await tokenRes.json();

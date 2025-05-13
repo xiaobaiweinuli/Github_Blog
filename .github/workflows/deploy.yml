@@ -23,8 +23,15 @@ jobs:
       - name: Install dependencies
         run: npm install
         
+      - name: Setup environment variables
+        run: echo "VITE_GH_CLIENT_ID=${{ secrets.VITE_GH_CLIENT_ID }}" >> $GITHUB_ENV
+        env:
+          VITE_GH_CLIENT_ID: ${{ secrets.VITE_GH_CLIENT_ID }}
+          VITE_GH_CLIENT_SECRET: ${{ secrets.VITE_GH_CLIENT_SECRET }}
+        
       - name: Build project
         env:
+          VITE_GH_CLIENT_ID: ${{ secrets.VITE_GH_CLIENT_ID }}
           VITE_GH_CLIENT_SECRET: ${{ secrets.VITE_GH_CLIENT_SECRET }}
         run: npm run build
         
