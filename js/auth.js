@@ -1,3 +1,6 @@
+// OAuth代理URL配置
+const OAUTH_PROXY_URL = "https://github-oauth-proxy.bxiao.workers.dev/";
+
 // 认证验证逻辑
 async function checkAuth() {
     try {
@@ -9,7 +12,7 @@ async function checkAuth() {
         }
 
         // 通过OAuthProvider验证token
-        const res = await fetch('/admin', {
+        const res = await fetch(`${OAUTH_PROXY_URL}admin`, {
             headers: { 'Authorization': `Bearer ${authData.token}` }
         });
         
@@ -51,7 +54,7 @@ function logout() {
     
     // 调用OAuthProvider的退出端点
     if (authData.token) {
-        fetch('/oauth/revoke', {
+        fetch(`${OAUTH_PROXY_URL}oauth/revoke`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

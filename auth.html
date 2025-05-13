@@ -37,8 +37,11 @@
             }
             
             try {
+                // 导入OAUTH_PROXY_URL常量
+                const OAUTH_PROXY_URL = "https://github-oauth-proxy.bxiao.workers.dev/";
+                
                 // 获取Access Token
-                const tokenRes = await fetch('/oauth/token', {
+                const tokenRes = await fetch(`${OAUTH_PROXY_URL}oauth/token`, {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',
@@ -59,7 +62,7 @@
             if (!tokenData.access_token) throw new Error('获取Token失败');
 
             // 使用access_token验证用户身份和权限
-            const adminCheckRes = await fetch('/admin', {
+            const adminCheckRes = await fetch(`${OAUTH_PROXY_URL}admin`, {
                 headers: { 'Authorization': `Bearer ${tokenData.access_token}` }
             });
             
