@@ -15,7 +15,7 @@ async function handleRequest(request) {
     githubAuthUrl.searchParams.set('scope', 'read:user');
     githubAuthUrl.searchParams.set('state', state);
     headers.set('Location', githubAuthUrl.toString());
-    headers.set('Set-Cookie', `github_state=${state}; Path=/auth; HttpOnly; Secure; SameSite=Lax; Max-Age=300`);
+    headers.set('Set-Cookie', `github_state=${state}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=300`);
     return new Response(null, { status: 302, headers });
   }
 
