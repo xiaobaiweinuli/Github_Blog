@@ -7,33 +7,51 @@
     
 </head>
 <body>
+    <div id="loading" class="text-center p-8">
+        <p>认证处理中，请稍候...</p>
+    </div>
+    
     <script type="module">
         (async () => {
-            const code = new URLSearchParams(window.location.search).get('code');
-            if (!code) {
+            // 获取URL参数
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            const state = urlParams.get('state');
+            
+            if (!code || !state) {
                 alert('无效的认证请求');
                 window.location.href = '/Github_Blog/login.html';
                 return;
             }
-
+            
+            // 验证state参数，防止CSRF攻击
+            const storedState = document.cookie
+                .split('; ')
+                .find(row => row.startsWith('gh_oauth_state='))
+                ?.split('=')[1];
+                
+            if (state !== storedState) {
+                alert('安全验证失败，请重新登录');
+                window.location.href = '/Github_Blog/login.html';
+                return;
+            }
+            
             try {
-                // 检查环境变量是否正确定义
-                if (!import.meta.env.VITE_GH_CLIENT_ID || !import.meta.env.VITE_GH_CLIENT_SECRET) {
-                    throw new Error('环境变量未正确定义，请检查登录页面');
-                }
+                // 导入OAUTH_PROXY_URL常量
+                const OAUTH_PROXY_URL = "https://github-oauth-proxy.bxiao.workers.dev/";
                 
                 // 获取Access Token
-                const workersUrl = 'https://github-oauth-proxy.bxiao.workers.dev'; // 实际的Workers URL
-            const state = crypto.randomUUID();
-                document.cookie = `gh_auth_state=${state}; Path=/; Secure; SameSite=Lax; Max-Age=3600`;
-                const tokenRes = await fetch(`${workersUrl}/auth/token?state=${state}`, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ code: code })
-            });
+                const tokenRes = await fetch(`${OAUTH_PROXY_URL}oauth/token`, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        code: code,
+                        state: state
+                    })
+                });
 
             if (tokenRes.status !== 200) {
                 const errorData = await tokenRes.json();
@@ -41,25 +59,33 @@
             }
 
             const tokenData = await tokenRes.json();
-                if (!tokenData.access_token) throw new Error('获取Token失败');
+            if (!tokenData.access_token) throw new Error('获取Token失败');
 
-                // 验证用户身份
-                const userRes = await fetch('https://api.github.com/user', {
-                    headers: { 'Authorization': `Bearer ${tokenData.access_token}` }
-                });
-                
-                const userData = await userRes.json();
-                const savedState = document.cookie.split('; ').find(row => row.startsWith('gh_auth_state='))?.split('=')[1];
-                if (state !== savedState) throw new Error('无效的state参数');
-                if (!import.meta.env.VITE_ALLOWED_USERS?.split(',').includes(userData.login)) throw new Error('无访问权限');
-
-                // 存储认证信息
-                localStorage.setItem('gh_auth', JSON.stringify({
-                    token: tokenData.access_token,
-                    expires: Date.now() + 3600000 // 1小时有效期
-                }));
-                
-                window.location.href = '/Github_Blog/admin.html';
+            // 使用access_token验证用户身份和权限
+            const adminCheckRes = await fetch(`${OAUTH_PROXY_URL}admin`, {
+                headers: { 'Authorization': `Bearer ${tokenData.access_token}` }
+            });
+            
+            if (!adminCheckRes.ok) {
+                const errorData = await adminCheckRes.json();
+                throw new Error(errorData.error || '权限验证失败');
+            }
+            
+            // 获取用户数据
+            const userData = await adminCheckRes.json();
+            
+            // 存储认证信息
+            localStorage.setItem('gh_auth', JSON.stringify({
+                token: tokenData.access_token,
+                user: userData.login,
+                expires: Date.now() + 3600000 // 1小时有效期
+            }));
+            
+            // 清除state cookie
+            document.cookie = 'gh_oauth_state=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+            
+            // 重定向到管理页面
+            window.location.href = '/Github_Blog/admin.html';
             } catch (error) {
                 console.error('认证失败:', error);
                 alert('认证失败: ' + error.message);

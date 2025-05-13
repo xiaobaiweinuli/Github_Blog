@@ -10,10 +10,8 @@ export default defineConfig(({ mode }) => {
     base: '/Github_Blog/',
     publicDir: path.resolve(__dirname, 'frontend'),
     define: {
-      'process.env': env,
-      'import.meta.env.VITE_GH_CLIENT_ID': JSON.stringify(env.VITE_GH_CLIENT_ID),
-      'import.meta.env.VITE_GH_CLIENT_SECRET': JSON.stringify(env.VITE_GH_CLIENT_SECRET)
-    },
+    'process.env': env
+  },
     build: {
       outDir: '../dist',
       emptyOutDir: true,
