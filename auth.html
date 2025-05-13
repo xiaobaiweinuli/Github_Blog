@@ -33,8 +33,9 @@
                 body: JSON.stringify({ code: code })
             });
 
-            if (!tokenRes.ok) {
-                throw new Error(`请求失败: ${tokenRes.status} ${tokenRes.statusText}`);
+            if (tokenRes.status !== 200) {
+                const errorData = await tokenRes.json();
+                throw new Error(`认证失败: ${errorData.error || tokenRes.statusText} (状态码: ${tokenRes.status})`);
             }
 
             const tokenData = await tokenRes.json();
