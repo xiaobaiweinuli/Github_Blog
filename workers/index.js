@@ -15,7 +15,7 @@ async function handleRequest(request) {
     githubAuthUrl.searchParams.set('scope', 'read:user');
     githubAuthUrl.searchParams.set('state', state);
     headers.set('Location', githubAuthUrl.toString());
-    headers.set('Set-Cookie', `github_state=${state}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=3600`);
+    headers.set('Set-Cookie', `github_state=${state}; Path=/auth; HttpOnly; Secure; SameSite=Lax; Max-Age=300`);
     return new Response(null, { status: 302, headers });
   }
 
@@ -24,7 +24,7 @@ async function handleRequest(request) {
     const code = url.searchParams.get('code');
     const state = url.searchParams.get('state');
     const cookies = request.headers.get('Cookie');
-    const savedState = cookies?.split('; ').find(c => c.startsWith('github_state='))?.split('=')[1];
+    const savedState = cookies?.split('; ').find(c => c.trim().startsWith('github_state='))?.split('=')[1]?.trim();
 
     if (!code) {
       return new Response('缺少code参数', { status: 400 });
